@@ -14,6 +14,10 @@ class BaseApp extends StatelessWidget {
       title: AppStrings.appTitle,
       theme: AppThemes.defaultMaterialTheme,
       home: PhotoExplorerView(),
+      builder: (context, child) => GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: child,
+      ),
     );
   }
 }

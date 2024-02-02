@@ -4,7 +4,7 @@ import 'package:flicker_search/Features/PhotoExplorer/photo_explorer_model.dart'
 import 'package:get/get.dart';
 
 class PhotoExplorerViewModel extends GetxController {
-  RxList<FlickerPhotoModel> photos = <FlickerPhotoModel>[].obs;
+  RxBool loading = false.obs;
 
   late PhotoExplorerServiceImpl _photoExplorerService;
   late PhotoExplorerModel _model;
@@ -15,11 +15,23 @@ class PhotoExplorerViewModel extends GetxController {
     _photoExplorerService = PhotoExplorerServiceImpl();
   }
 
-  recentPhotos() async =>
-      _updateModelPhotos(await _photoExplorerService.getRecentPhotos());
+  recentPhotos() async {
+    loading.value = true;
+    _updateModelPhotos(await _photoExplorerService.getRecentPhotos());
+    loading.value = false;
+  }
 
-  search(String searchTerm) async =>
+  search(String searchTerm) async {
+    if (searchTerm.isEmpty) {
+      recentPhotos();
+      // If user clear search field, then show recent photos
+    } else {
+      if (searchTerm.length < 3 || loading.value) return;
+      loading.value = true;
       _updateModelPhotos(await _photoExplorerService.searchPhotos(searchTerm));
+      loading.value = false;
+    }
+  }
 
   @override
   void onInit() {
